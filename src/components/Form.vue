@@ -1,16 +1,17 @@
 <template>
   <b-container fluid>
     <div id="form">
-      <b-form @submit="onSubmit">
+      <b-form @submit="onSubmit" @reset="onReset">
         <b-row>
           <b-col>
             <label for="string-input">Cadena de entrada:</label>
             <b-form-textarea
               id="string-input"
               v-model="inputString"
-              placeholder="Escriba su cadena"
+              placeholder="Escriba la cadena a reemplazar"
               rows="6"
               max-rows="6"
+              required
             ></b-form-textarea>
           </b-col>
         </b-row>
@@ -18,7 +19,7 @@
         <b-row>
           <b-col>
             <label for="regex-input">Expresión regular:</label>
-            <b-input type="text" id="regex-input" v-model="inputRegex"></b-input>
+            <b-input type="text" id="regex-input" v-model="inputRegex" required></b-input>
           </b-col>
           <b-col>
             <label for="replace-string-input">Cadena reemplazadora:</label>
@@ -26,24 +27,12 @@
           </b-col>
         </b-row>
         <br>
-        <!-- <b-row>
-          <b-col>
-            <label for="string-input">Cadena de salida:</label>
-            <b-form-textarea
-              id="string-output"
-              v-model="outputString"
-              rows="2"
-              max-rows="3"
-            ></b-form-textarea>
-          </b-col>
-        </b-row>
-        <br> -->
         <b-button type="submit" variant="primary">Calcular</b-button>
+        <b-button type="reset" variant="danger" style="margin-left:10px;">Reset</b-button>
       </b-form>
     </div>
     
     <div id="footer" class="container-fluid">
-      <span>Guillermo Tanamachi - A01631327</span>
       <span>Guillermo Tanamachi - A01631327</span>
     </div>
   </b-container>
@@ -62,101 +51,65 @@ export default {
     }
   },
   methods: {
+    onReset(evt) {
+      evt.preventDefault();
+      this.inputString = "";
+      this.inputRegex = "";
+      this.replaceString = "";
+      this.outputString = "";
+    },
     onSubmit(evt) {
       evt.preventDefault();
       let AFN = this.createAFN();
-      this.validateAFN(AFN, this.inputString);
-    },
-    createAFN() {
-      let initialState = this.createState("init", {});
-      let finalState = this.createState("final", {});
-      let states = [finalState];
-      let splitedRegex = this.inputRegex.split("+"); 
-      let stateNumber;
-      let isClosure = false;
-      a: for(let i = 0; i < splitedRegex.length; i++) {
-        if(splitedRegex[i][0] == '*') {
-          console.log("Error: No se puede iniciar la regex con '*'");
-          break;
-        }
-        stateNumber = 0;
-        for(let j = splitedRegex[i].length-1; j >= 0; j--) {
-          console.log(splitedRegex[i][j]);
-          if(isClosure) {
-            if(splitedRegex[i][j] !== '*') {
-              if(j == splitedRegex[i].length-2) {
-                if(splitedRegex[i].length == 2) {
-                  states[states.length-1].links = {
-                    ...states[states.length-1].links,
-                    [splitedRegex[i][j]]: 'final'
-                  } 
-                  initialState.links = {
-                    ...initialState.links,
-                    [splitedRegex[i][j]]: 'final'
-                  } 
-                } else {
-                  states.forEach(s => {
-                    if(s.id == 'final') {
-                      s.links = {
-                        ...s.links,
-                        [splitedRegex[i][j]]: 'final'
-                      } 
-                    }
-                  })
-                }
-              } else if(j == 0) {
-                console.log("cerradura izquieda")
-                Object.keys(states[states.length-1].links).forEach(l => {
-                  console.log(states[states.length-1].links[l]);
-                  console.log(states[states.length-1].id);
-                  if(states[states.length-1].links[l] == states[states.length-1].id) {
-                    states[states.length-1].links[l] = 'init';
-                  }
-                })
-                states[states.length-1].id = 'init';
-                states[states.length-1].links = {
-                  ...states[states.length-1].links,
-                  [splitedRegex[i][j]]: 'init'
-                }
-              } else {
-                states[states.length-1].links = {
-                  ...states[states.length-1].links,
-                  [splitedRegex[i][j]]: states[states.length-1].id
-                } 
-              }
-            } else {
-              console.log("Error: No puede haber dos '*' seguidos");
-              break a;
-            }
-            isClosure = false
-            continue;
-          }
-          if(splitedRegex[i][j] !== '*') {
-            if(j !== 0) {
-              let links = j == splitedRegex[i].length-1?
-                {[splitedRegex[i][j]]: "final"}:
-                {[splitedRegex[i][j]]: states[states.length-1].id}
-              states.push(this.createState(""+i+stateNumber, links))
-            } else {
-              if(initialState.links[splitedRegex[i][j]]) {
-                initialState.links[splitedRegex[i][j]] += ','+states[states.length-1].id
-              } else {
-                initialState.links = {
-                  ...initialState.links,
-                  [splitedRegex[i][j]]: states[states.length-1].id
-                }
-              }
-            }
-            stateNumber++;
-          } else {
-            isClosure = true;
+      // console.log(this.validateAFN(AFN, this.inputString));
+      //Doble aputadores
+      this.outputString = this.inputString;
+      for(let i = 0; i < this.outputString.length; i++) {
+        for(let j = i+1; j <= this.outputString.length; j++) {
+          console.log(this.outputString.substring(i, j));
+          if(this.validateAFN(AFN, this.outputString.substring(i, j))) {
+            this.outputString = this.outputString.substring(0, i)+this.replaceString+this.outputString.substring(j, this.outputString.length);
+            i = j-1;
+            break;
           }
         }
       }
-      states.push(initialState);
-      let AFN = {};
-      states.map(s => {if(!AFN[s.id]) AFN[s.id] = s.links});
-      console.log(states);
+      console.log(this.outputString);
+    },
+    createAFN() {
+      let splitedRegex = this.inputRegex.split("+"); 
+      let states = [];   
+      let isClosure = false;
+
+      for(let i = 0; i < splitedRegex.length; i++) {
+        states.push([this.createState("final", {})]);
+        for(let j = splitedRegex[i].length-1; j >= 0; j--) {
+          if(isClosure) {
+            states[i][states[i].length-1].links = {
+              ...states[i][states[i].length-1].links,
+              [splitedRegex[i][j]]: states[i][states[i].length-1].id
+            }
+            isClosure = false;
+          } else {
+            if(splitedRegex[i][j] !== '*') {
+              let links = {[splitedRegex[i][j]]: states[i][states[i].length-1].id}
+              states[i].push(this.createState(""+j, links))
+            } else {
+              isClosure = true;
+            }
+          }
+        }
+      }
+
+      let AFN = [];
+      states.forEach(route => {
+        let mappedRoute = {};
+        route.map(state => {
+          mappedRoute[state.id] = state.links;
+        })
+        AFN.push(mappedRoute);
+      });
+
       return AFN;
     },
     createState(_id,_links) {
@@ -166,35 +119,27 @@ export default {
       }
       return state
     },
-    checkForPath(AFN, initState, substring) {
-      console.log(AFN);
-      console.log(initState);
-      console.log(substring);
-    },
     validateAFN(AFN, string) {
-      console.log(AFN)
-      let currentState = 'init';
-      let i = 0;
-      let done, valid = false;
-      while(i < string.length && !done) {
-        if(AFN[currentState][string[i]]) {
-          if(AFN[currentState][string[i]].includes(",")) {
-            let possibleStates = AFN[currentState][string[i]].split(",");
-            possibleStates.forEach(s => {
-              this.checkForPath(AFN, s, s.substring(i, string.length));
-            })
-          } else {
-            currentState = AFN[currentState][string[i]];
+      let currentState = null;
+      let done, valid = false
+      for(let i = 0; i < AFN.length; i++) {
+        let route = AFN[i];
+        let j = 0;
+        currentState = Object.keys(route)[0];
+        done = false;
+        while(j < string.length && !done) {
+          if(route[currentState][string[j]]) {
+            currentState = route[currentState][string[j]];
             valid = currentState == 'final';
+          } else {
+            done = true;
+            valid = false;
           }
-        } else {
-          console.log("No Match");
-          done = true;
-          valid = false;
+          j++
         }
-        i++
+        if(valid) break;
       }
-      console.log(valid);
+      return valid;
     }
   }
 }
