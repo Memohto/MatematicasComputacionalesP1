@@ -37,7 +37,19 @@
     </div>
     
     <div id="footer" class="container-fluid">
-      <span>Guillermo Tanamachi - A01631327</span>
+      <b-row>
+        <b-col style="margin-top: 10px">
+          <img alt="Tec logo" src="../assets/logo.png" style="width: 150px; height: 50px">
+        </b-col>
+        <b-col style="text-align: right;">
+          <p>
+            <span style="display: block;">Guillermo Hiroshi Tanamachi Ortega - A01631327</span>
+            <span style="display: block;">Matemáticas Computacionales: Proyecto Parcial 1</span>
+            <span style="display: block;">Profesor: Luis Ricardo Peña Llamas</span>
+          </p>
+        </b-col>
+      </b-row>
+      
     </div>
   </b-container>
   
@@ -158,7 +170,7 @@ export default {
   bottom: 0;
   width: 100%;
   height: 5em;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.2);
   border-top: 1px dotted black;
   color: black;
 }
