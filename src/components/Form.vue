@@ -38,7 +38,7 @@
     
     <div id="footer" class="container-fluid">
       <b-row>
-        <b-col style="margin-top: 10px">
+        <b-col style="margin-top: 15px">
           <img alt="Tec logo" src="../assets/logo.png" style="width: 150px; height: 50px">
         </b-col>
         <b-col style="text-align: right;">
