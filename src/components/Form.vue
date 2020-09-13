@@ -27,8 +27,12 @@
           </b-col>
         </b-row>
         <br>
-        <b-button type="submit" variant="primary">Calcular</b-button>
+        <b-button type="submit" v-b-modal.output-modal variant="primary">Calcular</b-button>
         <b-button type="reset" variant="danger" style="margin-left:10px;">Reset</b-button>
+        <b-modal id="output-modal" size="lg" title="Respuesta:">
+          <b-form-textarea id="answer" plaintext rows="6" :value="outputString">
+          </b-form-textarea>
+        </b-modal>
       </b-form>
     </div>
     
@@ -62,23 +66,25 @@ export default {
       evt.preventDefault();
       let AFN = this.createAFN();
       // console.log(this.validateAFN(AFN, this.inputString));
-      //Doble aputadores
-      this.outputString = this.inputString;
-      for(let i = 0; i < this.outputString.length; i++) {
-        for(let j = i+1; j <= this.outputString.length; j++) {
-          console.log(this.outputString.substring(i, j));
-          if(this.validateAFN(AFN, this.outputString.substring(i, j))) {
-            this.outputString = this.outputString.substring(0, i)+this.replaceString+this.outputString.substring(j, this.outputString.length);
+      // Doble aputadores
+      let stringsToReplace = []
+      for(let i = 0; i < this.inputString.length; i++) {
+        for(let j = i+1; j <= this.inputString.length; j++) {
+          if(this.validateAFN(AFN, this.inputString.substring(i, j))) {
+            stringsToReplace.push(this.inputString.substring(i, j));
             i = j-1;
             break;
           }
         }
       }
-      console.log(this.outputString);
+      this.outputString = this.inputString;
+      stringsToReplace.forEach(r => {
+        this.outputString = this.outputString.replace(r, this.replaceString);
+      })
     },
     createAFN() {
       let splitedRegex = this.inputRegex.split("+"); 
-      let states = [];   
+      let states = [];
       let isClosure = false;
 
       for(let i = 0; i < splitedRegex.length; i++) {
