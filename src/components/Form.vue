@@ -79,16 +79,23 @@ export default {
       let AFN = this.createAFN();
       // console.log(this.validateAFN(AFN, this.inputString));
       // Doble aputadores
-      let stringsToReplace = []
-      for(let i = 0; i < this.inputString.length; i++) {
-        for(let j = i+1; j <= this.inputString.length; j++) {
+      let stringsToReplace = [];
+      let i = 0, j = 0;
+      let doneA = false, doneB = false;
+      while(i < this.inputString.length && !doneA) {
+        doneB = false;
+        j = i+1;
+        while(j <= this.inputString.length && !doneB) {
           if(this.validateAFN(AFN, this.inputString.substring(i, j))) {
             stringsToReplace.push(this.inputString.substring(i, j));
             i = j-1;
-            break;
+            doneB = true;
           }
+          j++;
         }
+        i++;
       }
+      
       this.outputString = this.inputString;
       stringsToReplace.forEach(r => {
         this.outputString = this.outputString.replace(r, this.replaceString);
