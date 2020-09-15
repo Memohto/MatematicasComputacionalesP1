@@ -77,29 +77,32 @@ export default {
     onSubmit(evt) {
       evt.preventDefault();
       let AFN = this.createAFN();
-      // console.log(this.validateAFN(AFN, this.inputString));
-      // Doble aputadores
-      let stringsToReplace = [];
-      let i = 0, j = 0;
-      let doneA = false, doneB = false;
-      while(i < this.inputString.length && !doneA) {
-        doneB = false;
-        j = i+1;
-        while(j <= this.inputString.length && !doneB) {
-          if(this.validateAFN(AFN, this.inputString.substring(i, j))) {
-            stringsToReplace.push(this.inputString.substring(i, j));
-            i = j-1;
-            doneB = true;
-          }
-          j++;
-        }
-        i++;
-      }
-      
+
+      let substrings = this.getAllSubstrings(this.inputString);
+      let substringsToReplace = substrings
+        .map(s => {
+          if(this.validateAFN(AFN, s)) {
+            return s;
+          }        
+        })
+        .filter(Boolean)
+        .sort((a, b) => {
+          return b.length-a.length;
+        });
+        
       this.outputString = this.inputString;
-      stringsToReplace.forEach(r => {
+      substringsToReplace.forEach(r => {
         this.outputString = this.outputString.replace(r, this.replaceString);
       })
+    },
+    getAllSubstrings(string) {
+      let substrings = [];
+      for (let i = 0; i < string.length; i++) {
+          for (let j = i + 1; j <= string.length; j++) {
+              substrings.push(string.slice(i, j));
+          }
+      }
+      return substrings;
     },
     createAFN() {
       let splitedRegex = this.inputRegex.split("+"); 
