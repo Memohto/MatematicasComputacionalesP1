@@ -4,6 +4,13 @@
       <b-form @submit="onSubmit" @reset="onReset">
         <b-row>
           <b-col>
+            <b-button class="float-right" v-b-toggle.sidebar-1>
+              <span>Info</span>
+            </b-button>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
             <label for="string-input">Cadena de entrada:</label>
             <b-form-textarea
               id="string-input"
@@ -27,12 +34,21 @@
           </b-col>
         </b-row>
         <br>
-        <b-button type="submit" v-b-modal.output-modal variant="primary">Calcular</b-button>
+        <b-button type="submit" variant="primary">Calcular</b-button>
         <b-button type="reset" variant="danger" style="margin-left:10px;">Reset</b-button>
-        <b-modal id="output-modal" size="lg" title="Respuesta:">
+        <b-modal id="output-modal" cancel-title='Reset' size="lg" title="Respuesta:" @cancel='resetModal'>
           <b-form-textarea id="answer" plaintext rows="6" :value="outputString">
           </b-form-textarea>
         </b-modal>
+        <b-sidebar id="sidebar-1" title="Sidebar" shadow>
+          <div class="px-3 py-2">
+            <p>
+              Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis
+              in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
+            </p>
+            <b-img src="https://picsum.photos/500/500/?image=54" fluid thumbnail></b-img>
+          </div>
+        </b-sidebar>
       </b-form>
     </div>
     
@@ -74,6 +90,12 @@ export default {
       this.replaceString = "";
       this.outputString = "";
     },
+    resetModal() {
+      this.inputString = "";
+      this.inputRegex = "";
+      this.replaceString = "";
+      this.outputString = "";
+    },
     onSubmit(evt) {
       evt.preventDefault();
       let AFN = this.createAFN();
@@ -89,11 +111,13 @@ export default {
         .sort((a, b) => {
           return b.length-a.length;
         });
-        
+
       this.outputString = this.inputString;
       substringsToReplace.forEach(r => {
         this.outputString = this.outputString.replace(r, this.replaceString);
-      })
+      });
+
+      this.$bvModal.show('output-modal');
     },
     getAllSubstrings(string) {
       let substrings = [];
@@ -183,13 +207,14 @@ export default {
   background-color: rgba(0, 0, 0, 0.2);
   border-top: 1px dotted black;
   color: black;
+  z-index: -100;
 }
 #form {
   margin: 0 auto;
-  margin-top: 30px;
+  margin-top: 20px;
   padding: 25px;
   width: 50%;
-  height: 26rem;
+  height: 28rem;
   border-radius: 25px;
   border: 2px solid black;
   background-color:rgba(65, 255, 75, 0.35);
