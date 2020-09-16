@@ -4,13 +4,6 @@
       <b-form @submit="onSubmit" @reset="onReset">
         <b-row>
           <b-col>
-            <b-button class="float-right" v-b-toggle.sidebar-1>
-              <span>Info</span>
-            </b-button>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col>
             <label for="string-input">Cadena de entrada:</label>
             <b-form-textarea
               id="string-input"
@@ -40,15 +33,6 @@
           <b-form-textarea id="answer" plaintext rows="6" :value="outputString">
           </b-form-textarea>
         </b-modal>
-        <b-sidebar id="sidebar-1" title="Sidebar" shadow>
-          <div class="px-3 py-2">
-            <p>
-              Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis
-              in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-            </p>
-            <b-img src="https://picsum.photos/500/500/?image=54" fluid thumbnail></b-img>
-          </div>
-        </b-sidebar>
       </b-form>
     </div>
     
@@ -99,7 +83,7 @@ export default {
     onSubmit(evt) {
       evt.preventDefault();
       let AFN = this.createAFN();
-
+      console.log(AFN);
       let substrings = this.getAllSubstrings(this.inputString);
       let substringsToReplace = substrings
         .map(s => {
@@ -108,6 +92,9 @@ export default {
           }        
         })
         .filter(Boolean)
+        .filter(s => {
+          return s != this.replaceString;
+        })
         .sort((a, b) => {
           return b.length-a.length;
         });
@@ -211,10 +198,10 @@ export default {
 }
 #form {
   margin: 0 auto;
-  margin-top: 20px;
+  margin-top: 30px;
   padding: 25px;
   width: 50%;
-  height: 28rem;
+  height: 25rem;
   border-radius: 25px;
   border: 2px solid black;
   background-color:rgba(65, 255, 75, 0.35);
