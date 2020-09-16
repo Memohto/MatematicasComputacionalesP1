@@ -83,7 +83,7 @@ export default {
     onSubmit(evt) {
       evt.preventDefault();
       let AFN = this.createAFN();
-      console.log(AFN);
+      // console.log(AFN);
       let substrings = this.getAllSubstrings(this.inputString);
       let substringsToReplace = substrings
         .map(s => {
